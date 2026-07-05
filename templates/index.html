@@ -11,14 +11,12 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
-        
         body {
             background: url('/static/background.jpg') center/cover no-repeat fixed;
             min-height: 100vh;
             font-family: 'Inter', sans-serif;
             position: relative;
         }
-        
         body::before {
             content: "";
             position: fixed;
@@ -29,95 +27,16 @@
             background: rgba(15, 23, 42, 0.4);
             z-index: -1;
         }
-        
-        .main-container {
-            background: rgba(255, 255, 255, 0.226);
-            backdrop-filter: blur(12px);
-            border-radius: 32px;
-            box-shadow: 0 25px 50px -12px rgb(0 0 0 / 0.5);
-            border: 1px solid rgba(255, 255, 255, 0.4);
-        }
-        
-        .card-glass {
-            background: rgba(255, 255, 255, 0.75);
-            backdrop-filter: blur(8px);
-            border-radius: 24px;
-            border: 1px solid rgba(255, 255, 255, 0.5);
-            height: 100%;
-            display: flex;
-            flex-direction: column;
-        }
-
-        .mol-3d-container {
-            background: #ffffff;
-            border-radius: 20px;
-            border: 2px solid #f1f5f9;
-            width: 100%;
-            height: 400px;
-            position: relative;
-            overflow: hidden;
-        }
-        
-        .section-title {
-            font-size: 1.1rem;
-            font-weight: 700;
-            color: #0f172a;
-            margin-bottom: 1.25rem;
-            display: flex;
-            align-items: center;
-            gap: 0.6rem;
-            text-transform: uppercase;
-            letter-spacing: 0.025em;
-        }
-
-        #similarity-map svg {
-            width: 100%;
-            height: auto;
-            max-height: 900px;
-        }
-
-        .results-grid {
-            display: flex;
-            flex-direction: column;
-            gap: 2rem;
-        }
-
-        /* PDF Icon Button */
-        .pdf-export-btn {
-            position: fixed;
-            top: 30px;
-            right: 30px;
-            z-index: 40;
-            width: 60px;
-            height: 60px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, #ef4444, #dc2626);
-            color: white;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 24px;
-            cursor: pointer;
-            box-shadow: 0 8px 24px rgba(239, 68, 68, 0.4);
-            transition: all 0.3s ease;
-            border: none;
-        }
-
-        .pdf-export-btn:hover {
-            transform: scale(1.1) rotate(5deg);
-            box-shadow: 0 12px 32px rgba(239, 68, 68, 0.6);
-            background: linear-gradient(135deg, #dc2626, #991b1b);
-        }
-
-        .pdf-export-btn:active {
-            transform: scale(0.95);
-        }
-
-        .pdf-export-btn.hidden {
-            display: none;
-        }
-
-        /* Custom Scrollbar */
+        .main-container { background: rgba(255, 255, 255, 0.226); backdrop-filter: blur(12px); border-radius: 32px; box-shadow: 0 25px 50px -12px rgb(0 0 0 / 0.5); border: 1px solid rgba(255, 255, 255, 0.4); }
+        .card-glass { background: rgba(255, 255, 255, 0.75); backdrop-filter: blur(8px); border-radius: 24px; border: 1px solid rgba(255, 255, 255, 0.5); height: 100%; display: flex; flex-direction: column; }
+        .mol-3d-container { background: #ffffff; border-radius: 20px; border: 2px solid #f1f5f9; width: 100%; height: 400px; position: relative; overflow: hidden; }
+        .section-title { font-size: 1.1rem; font-weight: 700; color: #0f172a; margin-bottom: 1.25rem; display: flex; align-items: center; gap: 0.6rem; text-transform: uppercase; letter-spacing: 0.025em; }
+        #similarity-map svg { width: 100%; height: auto; max-height: 900px; }
+        .results-grid { display: flex; flex-direction: column; gap: 2rem; }
+        .pdf-export-btn { position: fixed; top: 30px; right: 30px; z-index: 40; width: 60px; height: 60px; border-radius: 50%; background: linear-gradient(135deg, #ef4444, #dc2626); color: white; display: flex; align-items: center; justify-content: center; font-size: 24px; cursor: pointer; box-shadow: 0 8px 24px rgba(239, 68, 68, 0.4); transition: all 0.3s ease; border: none; }
+        .pdf-export-btn:hover { transform: scale(1.1) rotate(5deg); box-shadow: 0 12px 32px rgba(239, 68, 68, 0.6); background: linear-gradient(135deg, #dc2626, #991b1b); }
+        .pdf-export-btn:active { transform: scale(0.95); }
+        .pdf-export-btn.hidden { display: none; }
         ::-webkit-scrollbar { width: 8px; }
         ::-webkit-scrollbar-track { background: transparent; }
         ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
@@ -125,14 +44,9 @@
     </style>
 </head>
 <body class="py-12">
-    <!-- PDF Export Button -->
-    <button id="pdf-export-btn" class="pdf-export-btn hidden" onclick="downloadReport()" title="Baixar Relatório em PDF">
-        <i class="fas fa-file-pdf"></i>
-    </button>
-
+    <button id="pdf-export-btn" class="pdf-export-btn hidden" onclick="downloadReport()" title="Baixar Relatório em PDF"><i class="fas fa-file-pdf"></i></button>
     <div class="max-w-[1400px] mx-auto px-6">
         <div class="main-container p-8 md:p-12">
-            <!-- Header -->
             <div class="flex flex-col md:flex-row justify-between items-center mb-12 gap-6">
                 <div class="flex items-center gap-5">
                     <div class="w-16 h-16 bg-white text-sky-600 rounded-2xl flex items-center justify-center text-4xl shadow-sm border border-slate-100">🧪</div>
@@ -142,26 +56,21 @@
                     </div>
                 </div>
             </div>
-
             <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-stretch">
-                <!-- Coluna Esquerda: Entrada -->
                 <div class="lg:col-span-4">
                     <div class="card-glass p-8 shadow-sm">
                         <h2 class="text-2xl font-black mb-8 text-slate-800 border-b border-slate-100 pb-4">Moléculas</h2>
-                        
                         <div class="space-y-6 flex-grow">
                             <div>
                                 <label class="block text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-2">Referência</label>
                                 <input id="smiles-ref" type="text" placeholder="SMILES" class="w-full px-5 py-4 bg-white border border-slate-200 rounded-2xl font-mono text-sm focus:ring-2 focus:ring-sky-300 focus:border-sky-300 outline-none transition-all">
                                 <input id="name-ref" type="text" placeholder="Nome da Molécula" class="mt-3 w-full px-5 py-4 bg-white border border-slate-200 rounded-2xl text-sm focus:ring-2 focus:ring-sky-300 focus:border-sky-300 outline-none transition-all">
                             </div>
-
                             <div>
                                 <label class="block text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-2">Teste</label>
                                 <input id="smiles-test" type="text" placeholder="SMILES" class="w-full px-5 py-4 bg-white border border-slate-200 rounded-2xl font-mono text-sm focus:ring-2 focus:ring-sky-300 focus:border-sky-300 outline-none transition-all">
                                 <input id="name-test" type="text" placeholder="Nome da Molécula" class="mt-3 w-full px-5 py-4 bg-white border border-slate-200 rounded-2xl text-sm focus:ring-2 focus:ring-sky-300 focus:border-sky-300 outline-none transition-all">
                             </div>
-
                             <div class="grid grid-cols-2 gap-4">
                                 <div>
                                     <label class="block text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-2">Fingerprint</label>
@@ -179,36 +88,24 @@
                                     </select>
                                 </div>
                             </div>
-
                             <label class="flex items-center gap-4 cursor-pointer py-2 group">
                                 <div class="relative">
                                     <input type="checkbox" id="show-map" checked class="peer hidden">
-                                    <div class="w-6 h-6 border-2 border-slate-300 rounded-lg peer-checked:bg-sky-600 peer-checked:border-sky-600 transition-all flex items-center justify-center">
-                                        <i class="fas fa-check text-white text-xs"></i>
-                                    </div>
+                                    <div class="w-6 h-6 border-2 border-slate-300 rounded-lg peer-checked:bg-sky-600 peer-checked:border-sky-600 transition-all flex items-center justify-center"><i class="fas fa-check text-white text-xs"></i></div>
                                 </div>
                                 <span class="text-sm font-bold text-slate-600 group-hover:text-sky-600 transition-all">Gerar Similarity Map</span>
                             </label>
                         </div>
-
-                        <button onclick="compareMolecules()" id="btn-compare" class="mt-8 w-full bg-sky-600 hover:bg-sky-700 text-white font-black py-5 rounded-2xl text-lg flex items-center justify-center gap-3 transition-all shadow-lg shadow-sky-500/30">
-                            <i class="fas fa-bolt"></i> COMPARAR AGORA
-                        </button>
+                        <button onclick="compareMolecules()" id="btn-compare" class="mt-8 w-full bg-sky-600 hover:bg-sky-700 text-white font-black py-5 rounded-2xl text-lg flex items-center justify-center gap-3 transition-all shadow-lg shadow-sky-500/30"><i class="fas fa-bolt"></i> COMPARAR AGORA</button>
                     </div>
                 </div>
-
-                <!-- Coluna Direita: Resultados -->
                 <div class="lg:col-span-8">
                     <div id="placeholder-results" class="h-full flex flex-col items-center justify-center text-slate-400 border-2 border-dashed border-slate-200 rounded-[32px] p-12 bg-white/30">
-                        <div class="w-24 h-24 bg-white rounded-full flex items-center justify-center mb-6 shadow-sm">
-                            <i class="fas fa-microscope text-4xl text-slate-200"></i>
-                        </div>
+                        <div class="w-24 h-24 bg-white rounded-full flex items-center justify-center mb-6 shadow-sm"><i class="fas fa-microscope text-4xl text-slate-200"></i></div>
                         <p class="text-xl font-bold text-slate-500">Aguardando análise...</p>
                         <p class="text-sm text-slate-400 mt-2">Configure as moléculas à esquerda para iniciar</p>
                     </div>
-
                     <div id="result-content" class="hidden results-grid">
-                        <!-- Score Card -->
                         <div class="card-glass p-8 flex flex-col md:flex-row justify-between items-center gap-8">
                             <div class="text-center md:text-left">
                                 <p class="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-2">Índice de Similaridade</p>
@@ -223,8 +120,6 @@
                                 <p id="method-info" class="text-xl font-black text-slate-800"></p>
                             </div>
                         </div>
-
-                        <!-- Moléculas 3D -->
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div class="card-glass p-6">
                                 <p class="text-center text-[10px] font-black text-sky-600 uppercase tracking-[0.2em] mb-4">Referência: <span id="name-ref-result" class="text-slate-900"></span></p>
@@ -238,61 +133,30 @@
                     </div>
                 </div>
             </div>
-
-            <!-- Seção Inferior: Propriedades, LogD e Mapa -->
             <div id="bottom-results" class="hidden mt-8 space-y-8">
-                <!-- Propriedades e LogD Lado a Lado -->
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
                     <div class="card-glass p-8">
                         <h3 class="section-title"><i class="fas fa-list-ul text-sky-500"></i> Propriedades Físico-Químicas</h3>
                         <div class="overflow-hidden rounded-2xl border border-slate-100">
-                            <table id="props-table" class="w-full text-sm">
-                                <thead>
-                                    <tr class="bg-slate-50 text-slate-500">
-                                        <th class="text-left px-6 py-4 font-bold uppercase text-[10px] tracking-widest">Propriedade</th>
-                                        <th class="text-center px-6 py-4 font-bold uppercase text-[10px] tracking-widest">Ref.</th>
-                                        <th class="text-center px-6 py-4 font-bold uppercase text-[10px] tracking-widest">Teste</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="props-body" class="divide-y divide-slate-50"></tbody>
-                            </table>
+                            <table id="props-table" class="w-full text-sm"><thead><tr class="bg-slate-50 text-slate-500"><th class="text-left px-6 py-4 font-bold uppercase text-[10px] tracking-widest">Propriedade</th><th class="text-center px-6 py-4 font-bold uppercase text-[10px] tracking-widest">Ref.</th><th class="text-center px-6 py-4 font-bold uppercase text-[10px] tracking-widest">Teste</th></tr></thead><tbody id="props-body" class="divide-y divide-slate-50"></tbody></table>
                         </div>
                     </div>
                     <div class="card-glass p-8">
                         <h3 class="section-title"><i class="fas fa-chart-area text-sky-500"></i> Perfil de Lipofilicidade (LogD vs pH)</h3>
-                        <div class="h-[350px] w-full">
-                            <canvas id="logd-chart"></canvas>
-                        </div>
+                        <div class="h-[350px] w-full"><canvas id="logd-chart"></canvas></div>
                     </div>
                 </div>
-
-                <!-- Mapa de Similaridade (Largura Total) -->
                 <div id="similarity-map-container" class="hidden card-glass p-10">
                     <div class="flex flex-col md:flex-row justify-between items-baseline mb-8 gap-4">
                         <h3 class="section-title mb-0"><i class="fas fa-map-marked-alt text-sky-500"></i> Mapa de Similaridade Atômica</h3>
-                        <div class="px-4 py-2 bg-sky-50 text-sky-700 rounded-xl text-[10px] font-black uppercase tracking-widest border border-sky-100">
-                            Método: Morgan2
-                        </div>
+                        <div class="px-4 py-2 bg-sky-50 text-sky-700 rounded-xl text-[10px] font-black uppercase tracking-widest border border-sky-100">Método: Morgan2</div>
                     </div>
                     <div id="similarity-map" class="bg-white rounded-[32px] p-8 border-2 border-slate-50 flex justify-center items-center shadow-inner min-h-[600px]"></div>
-                    <div class="mt-6 flex justify-center gap-8">
-                        <div class="flex items-center gap-2">
-                            <div class="w-3 h-3 rounded-full bg-emerald-500"></div>
-                            <span class="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Contribuição Positiva</span>
-                        </div>
-                        <div class="flex items-center gap-2">
-                            <div class="w-3 h-3 rounded-full bg-rose-500"></div>
-                            <span class="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Contribuição Negativa</span>
-                        </div>
-                    </div>
                 </div>
             </div>
         </div>
     </div>
-
-    <!-- Toast -->
     <div id="toast" class="hidden fixed bottom-8 right-8 px-8 py-5 rounded-2xl shadow-2xl text-white font-bold flex items-center gap-4 z-50 transition-all transform translate-y-0"></div>
-
     <script>
         let currentResult = null;
         let logdChartInstance = null;
@@ -300,11 +164,7 @@
         async function compareMolecules() {
             const smilesRef = document.getElementById('smiles-ref').value.trim();
             const smilesTest = document.getElementById('smiles-test').value.trim();
-            
-            if (!smilesRef || !smilesTest) {
-                showToast('Por favor, insira os dois SMILES', 'error');
-                return;
-            }
+            if (!smilesRef || !smilesTest) return showToast('Por favor, insira os dois SMILES', 'error');
 
             const btn = document.getElementById('btn-compare');
             const originalHtml = btn.innerHTML;
@@ -325,10 +185,8 @@
                         show_logd: document.getElementById('show-map').checked
                     })
                 });
-
                 const result = await response.json();
                 if (result.error) throw new Error(result.error);
-
                 currentResult = result;
                 renderResults(result);
                 document.getElementById('pdf-export-btn').classList.remove('hidden');
@@ -345,38 +203,19 @@
             document.getElementById('placeholder-results').classList.add('hidden');
             document.getElementById('result-content').classList.remove('hidden');
             document.getElementById('bottom-results').classList.remove('hidden');
-
             document.getElementById('similarity-score').textContent = r.similarity.toFixed(4);
             document.getElementById('method-info').textContent = `${r.fp_type} • ${document.getElementById('metric').value}`;
-            
             const badge = document.getElementById('classification-badge');
             badge.textContent = r.classification;
             const isHigh = r.classification.includes('Alta');
             badge.className = `px-6 py-2 text-[10px] font-black rounded-full uppercase tracking-widest ${isHigh ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-700'}`;
-
             document.getElementById('name-ref-result').textContent = r.name_ref;
             document.getElementById('name-test-result').textContent = r.name_test;
-
             init3D('3d-ref-container', r.molblock_ref);
             init3D('3d-test-container', r.molblock_test);
-
             const mapCont = document.getElementById('similarity-map-container');
-            if (r.similarity_map) {
-                mapCont.classList.remove('hidden');
-                document.getElementById('similarity-map').innerHTML = r.similarity_map;
-            } else {
-                mapCont.classList.add('hidden');
-            }
-
-            const tbody = document.getElementById('props-body');
-            tbody.innerHTML = r.properties.map(p => `
-                <tr class="hover:bg-slate-50/80 transition-colors">
-                    <td class="px-6 py-4 font-semibold text-slate-600">${p.Propriedade}</td>
-                    <td class="px-6 py-4 text-center text-slate-900 font-bold">${p.Referência}</td>
-                    <td class="px-6 py-4 text-center text-slate-900 font-bold">${p.Teste}</td>
-                </tr>
-            `).join('');
-
+            if (r.similarity_map) { mapCont.classList.remove('hidden'); document.getElementById('similarity-map').innerHTML = r.similarity_map; } else { mapCont.classList.add('hidden'); }
+            document.getElementById('props-body').innerHTML = r.properties.map(p => `<tr class="hover:bg-slate-50/80 transition-colors"><td class="px-6 py-4 font-semibold text-slate-600">${p.Propriedade}</td><td class="px-6 py-4 text-center text-slate-900 font-bold">${p.Referência}</td><td class="px-6 py-4 text-center text-slate-900 font-bold">${p.Teste}</td></tr>`).join('');
             renderChart(r);
         }
 
@@ -393,140 +232,79 @@
         function renderChart(r) {
             const ctx = document.getElementById('logd-chart').getContext('2d');
             if (logdChartInstance) logdChartInstance.destroy();
-
             logdChartInstance = new Chart(ctx, {
-                type: 'line',
-                data: {
-                    labels: r.logd_ref.map(d => d.pH),
-                    datasets: [
-                        {
-                            label: r.name_ref,
-                            data: r.logd_ref.map(d => d.LogD),
-                            borderColor: '#0ea5e9',
-                            backgroundColor: 'rgba(14, 165, 233, 0.05)',
-                            borderWidth: 3,
-                            pointRadius: 4,
-                            fill: true,
-                            tension: 0.4
-                        },
-                        {
-                            label: r.name_test,
-                            data: r.logd_test.map(d => d.LogD),
-                            borderColor: '#f59e0b',
-                            backgroundColor: 'rgba(245, 158, 11, 0.05)',
-                            borderWidth: 3,
-                            pointRadius: 4,
-                            fill: true,
-                            tension: 0.4
-                        }
-                    ]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: { 
-                        legend: { position: 'top', labels: { boxWidth: 8, font: { size: 11, weight: 'bold' }, padding: 20 } },
-                        tooltip: { backgroundColor: 'rgba(15, 23, 42, 0.9)', padding: 12, titleFont: { size: 12 }, bodyFont: { size: 12 } }
-                    },
-                    scales: {
-                        y: { ticks: { font: { size: 11, weight: '500' } }, grid: { color: '#f1f5f9' }, title: { display: true, text: 'LogD', font: { weight: 'bold' } } },
-                        x: { ticks: { font: { size: 11, weight: '500' } }, grid: { display: false }, title: { display: true, text: 'pH', font: { weight: 'bold' } } }
-                    }
-                }
+                type: 'line', data: { labels: r.logd_ref.map(d => d.pH), datasets: [{ label: r.name_ref, data: r.logd_ref.map(d => d.LogD), borderColor: '#0ea5e9', backgroundColor: 'rgba(14, 165, 233, 0.05)', borderWidth: 3, pointRadius: 4, fill: true, tension: 0.4 }, { label: r.name_test, data: r.logd_test.map(d => d.LogD), borderColor: '#f59e0b', backgroundColor: 'rgba(245, 158, 11, 0.05)', borderWidth: 3, pointRadius: 4, fill: true, tension: 0.4 }] },
+                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'top', labels: { boxWidth: 8, font: { size: 11, weight: 'bold' }, padding: 20 } }, tooltip: { backgroundColor: 'rgba(15, 23, 42, 0.9)', padding: 12, titleFont: { size: 12 }, bodyFont: { size: 12 } } }, scales: { y: { ticks: { font: { size: 11, weight: '500' } }, grid: { color: '#f1f5f9' }, title: { display: true, text: 'LogD', font: { weight: 'bold' } } }, x: { ticks: { font: { size: 11, weight: '500' } }, grid: { display: false }, title: { display: true, text: 'pH', font: { weight: 'bold' } } } } }
             });
         }
 
         function downloadReport() {
             if (!currentResult) return;
             showToast('Gerando relatório PDF...', 'info');
-            
             const element = document.createElement('div');
             element.style.padding = '40px';
             element.style.fontFamily = 'Arial, sans-serif';
             element.innerHTML = `
-                <div style="text-align: center; margin-bottom: 40px; border-bottom: 3px solid #0ea5e9; padding-bottom: 30px;">
-                    <h1 style="font-size: 32px; color: #0f172a; margin: 0; font-weight: bold;">MolSim v3.3</h1>
-                    <p style="color: #64748b; font-size: 14px; margin: 10px 0 0 0;">Relatório de Análise de Similaridade Molecular</p>
+                <div style="text-align:center;margin-bottom:32px;border-bottom:3px solid #0ea5e9;padding-bottom:24px;">
+                    <h1 style="font-size:32px;color:#0f172a;margin:0;font-weight:bold;">MolSim v3.3</h1>
+                    <p style="color:#64748b;font-size:14px;margin:10px 0 0;">Relatório de Análise de Similaridade Molecular</p>
                 </div>
-
-                <div style="margin-bottom: 30px; background: #f8fafc; padding: 20px; border-radius: 8px; border-left: 4px solid #0ea5e9;">
-                    <h2 style="color: #0f172a; margin: 0 0 15px 0; font-size: 18px;">Resumo da Análise</h2>
-                    <table style="width: 100%; border-collapse: collapse;">
-                        <tr><td style="padding: 8px; color: #64748b; font-weight: bold;">Molécula Referência:</td><td style="padding: 8px; color: #0f172a;">${currentResult.name_ref}</td></tr>
-                        <tr><td style="padding: 8px; color: #64748b; font-weight: bold;">Molécula Teste:</td><td style="padding: 8px; color: #0f172a;">${currentResult.name_test}</td></tr>
-                        <tr><td style="padding: 8px; color: #64748b; font-weight: bold;">Fingerprint:</td><td style="padding: 8px; color: #0f172a;">${currentResult.fp_type}</td></tr>
-                        <tr><td style="padding: 8px; color: #64748b; font-weight: bold;">Métrica:</td><td style="padding: 8px; color: #0f172a;">${document.getElementById('metric').value}</td></tr>
+                <div style="margin-bottom:24px;background:#f8fafc;padding:18px;border-radius:10px;border-left:4px solid #0ea5e9;">
+                    <h2 style="color:#0f172a;margin:0 0 12px;font-size:18px;">Resumo da Análise</h2>
+                    <table style="width:100%;border-collapse:collapse;">
+                        <tr><td style="padding:8px;color:#64748b;font-weight:bold;">Molécula Referência:</td><td style="padding:8px;color:#0f172a;">${currentResult.name_ref}</td></tr>
+                        <tr><td style="padding:8px;color:#64748b;font-weight:bold;">Molécula Teste:</td><td style="padding:8px;color:#0f172a;">${currentResult.name_test}</td></tr>
+                        <tr><td style="padding:8px;color:#64748b;font-weight:bold;">Fingerprint:</td><td style="padding:8px;color:#0f172a;">${currentResult.fp_type}</td></tr>
+                        <tr><td style="padding:8px;color:#64748b;font-weight:bold;">Métrica:</td><td style="padding:8px;color:#0f172a;">${document.getElementById('metric').value}</td></tr>
                     </table>
                 </div>
-
-                <div style="margin-bottom: 30px; background: #f0fdf4; padding: 20px; border-radius: 8px; border-left: 4px solid #10b981;">
-                    <h2 style="color: #0f172a; margin: 0 0 15px 0; font-size: 18px;">Resultado</h2>
-                    <div style="display: flex; align-items: center; gap: 20px;">
-                        <div style="text-align: center;">
-                            <div style="font-size: 48px; color: #0ea5e9; font-weight: bold;">${currentResult.similarity.toFixed(4)}</div>
-                            <div style="color: #64748b; font-size: 12px; margin-top: 5px;">Índice de Similaridade</div>
+                <div style="margin-bottom:24px;background:#f0fdf4;padding:18px;border-radius:10px;border-left:4px solid #10b981;">
+                    <h2 style="color:#0f172a;margin:0 0 12px;font-size:18px;">Resultado</h2>
+                    <div style="display:flex;align-items:center;gap:18px;">
+                        <div style="text-align:center;">
+                            <div style="font-size:46px;color:#0ea5e9;font-weight:bold;">${currentResult.similarity.toFixed(4)}</div>
+                            <div style="color:#64748b;font-size:12px;margin-top:5px;">Índice de Similaridade</div>
                         </div>
-                        <div style="text-align: center; background: ${currentResult.classification.includes('Alta') ? '#d1fae5' : '#fef3c7'}; padding: 15px 25px; border-radius: 8px;">
-                            <div style="color: ${currentResult.classification.includes('Alta') ? '#047857' : '#92400e'}; font-weight: bold;">${currentResult.classification}</div>
-                        </div>
-                    </div>
-                </div>
-
-                <div style="margin-bottom: 30px;">
-                    <h2 style="color: #0f172a; margin: 0 0 15px 0; font-size: 18px; border-bottom: 2px solid #e2e8f0; padding-bottom: 10px;">Estruturas e Fingerprints</h2>
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
-                        <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 16px;">
-                            <h3 style="margin: 0 0 12px 0; color: #0f172a; font-size: 14px;">${currentResult.name_ref}</h3>
-                            <img src="data:image/png;base64,${currentResult.png_ref}" style="width: 100%; max-width: 280px; display: block; margin: 0 auto 12px auto;" />
-                            <img src="data:image/png;base64,${currentResult.fingerprint_ref_png || ''}" style="width: 100%; max-width: 280px; display: block; margin: 0 auto;" />
-                        </div>
-                        <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 16px;">
-                            <h3 style="margin: 0 0 12px 0; color: #0f172a; font-size: 14px;">${currentResult.name_test}</h3>
-                            <img src="data:image/png;base64,${currentResult.png_test}" style="width: 100%; max-width: 280px; display: block; margin: 0 auto 12px auto;" />
-                            <img src="data:image/png;base64,${currentResult.fingerprint_test_png || ''}" style="width: 100%; max-width: 280px; display: block; margin: 0 auto;" />
+                        <div style="text-align:center;background:${currentResult.classification.includes('Alta') ? '#d1fae5' : '#fef3c7'};padding:14px 22px;border-radius:8px;">
+                            <div style="color:${currentResult.classification.includes('Alta') ? '#047857' : '#92400e'};font-weight:bold;">${currentResult.classification}</div>
                         </div>
                     </div>
                 </div>
-
-                <div style="margin-bottom: 30px;">
-                    <h2 style="color: #0f172a; margin: 0 0 15px 0; font-size: 18px; border-bottom: 2px solid #e2e8f0; padding-bottom: 10px;">Propriedades Físico-Químicas</h2>
-                    <table style="width: 100%; border-collapse: collapse; margin-top: 10px;">
-                        <thead>
-                            <tr style="background: #f1f5f9;">
-                                <th style="padding: 12px; text-align: left; border-bottom: 2px solid #cbd5e1; font-weight: bold; color: #0f172a; font-size: 12px;">Propriedade</th>
-                                <th style="padding: 12px; text-align: center; border-bottom: 2px solid #cbd5e1; font-weight: bold; color: #0f172a; font-size: 12px;">Referência</th>
-                                <th style="padding: 12px; text-align: center; border-bottom: 2px solid #cbd5e1; font-weight: bold; color: #0f172a; font-size: 12px;">Teste</th>
-                                <th style="padding: 12px; text-align: center; border-bottom: 2px solid #cbd5e1; font-weight: bold; color: #0f172a; font-size: 12px;">Diferença</th>
-                            </tr>
-                        </thead>
+                <div style="margin-bottom:24px;">
+                    <h2 style="color:#0f172a;margin:0 0 15px;font-size:18px;border-bottom:2px solid #e2e8f0;padding-bottom:10px;">Estruturas e Fingerprints</h2>
+                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+                        <div style="background:#fff;border:1px solid #e2e8f0;border-radius:12px;padding:14px;">
+                            <h3 style="margin:0 0 10px;color:#0f172a;font-size:14px;">${currentResult.name_ref}</h3>
+                            <div style="display:flex;flex-direction:column;gap:10px;align-items:center;">
+                                <img src="data:image/png;base64,${currentResult.png_ref}" style="width:100%;max-width:260px;display:block;" />
+                                <img src="data:image/png;base64,${currentResult.fingerprint_ref_png || ''}" style="width:100%;max-width:260px;display:block;" />
+                            </div>
+                        </div>
+                        <div style="background:#fff;border:1px solid #e2e8f0;border-radius:12px;padding:14px;">
+                            <h3 style="margin:0 0 10px;color:#0f172a;font-size:14px;">${currentResult.name_test}</h3>
+                            <div style="display:flex;flex-direction:column;gap:10px;align-items:center;">
+                                <img src="data:image/png;base64,${currentResult.png_test}" style="width:100%;max-width:260px;display:block;" />
+                                <img src="data:image/png;base64,${currentResult.fingerprint_test_png || ''}" style="width:100%;max-width:260px;display:block;" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div style="margin-bottom:24px;">
+                    <h2 style="color:#0f172a;margin:0 0 15px;font-size:18px;border-bottom:2px solid #e2e8f0;padding-bottom:10px;">Propriedades Físico-Químicas</h2>
+                    <table style="width:100%;border-collapse:collapse;margin-top:10px;">
+                        <thead><tr style="background:#f1f5f9;"><th style="padding:12px;text-align:left;border-bottom:2px solid #cbd5e1;font-weight:bold;color:#0f172a;font-size:12px;">Propriedade</th><th style="padding:12px;text-align:center;border-bottom:2px solid #cbd5e1;font-weight:bold;color:#0f172a;font-size:12px;">Referência</th><th style="padding:12px;text-align:center;border-bottom:2px solid #cbd5e1;font-weight:bold;color:#0f172a;font-size:12px;">Teste</th><th style="padding:12px;text-align:center;border-bottom:2px solid #cbd5e1;font-weight:bold;color:#0f172a;font-size:12px;">Diferença</th></tr></thead>
                         <tbody>
-                            ${currentResult.properties.map((p, i) => `
-                                <tr style="border-bottom: 1px solid #e2e8f0; ${i % 2 === 0 ? 'background: #f8fafc;' : ''}">
-                                    <td style="padding: 10px 12px; color: #0f172a; font-size: 12px;">${p.Propriedade}</td>
-                                    <td style="padding: 10px 12px; text-align: center; color: #64748b; font-size: 12px;">${p.Referência}</td>
-                                    <td style="padding: 10px 12px; text-align: center; color: #64748b; font-size: 12px;">${p.Teste}</td>
-                                    <td style="padding: 10px 12px; text-align: center; color: #64748b; font-size: 12px;">${p.Diferença}</td>
-                                </tr>
-                            `).join('')}
+                            ${currentResult.properties.map((p, i) => `<tr style="border-bottom:1px solid #e2e8f0;${i % 2 === 0 ? 'background:#f8fafc;' : ''}"><td style="padding:10px 12px;color:#0f172a;font-size:12px;">${p.Propriedade}</td><td style="padding:10px 12px;text-align:center;color:#64748b;font-size:12px;">${p.Referência}</td><td style="padding:10px 12px;text-align:center;color:#64748b;font-size:12px;">${p.Teste}</td><td style="padding:10px 12px;text-align:center;color:#64748b;font-size:12px;">${p.Diferença}</td></tr>`).join('')}
                         </tbody>
                     </table>
                 </div>
-
-                <div style="margin-top: 40px; padding-top: 20px; border-top: 2px solid #e2e8f0; color: #64748b; font-size: 11px; text-align: center;">
-                    <p style="margin: 5px 0;">Gerado por MolSim v3.3 - Quimioinformática de Alta Precisão</p>
-                    <p style="margin: 5px 0;">${new Date().toLocaleDateString('pt-BR')} às ${new Date().toLocaleTimeString('pt-BR')}</p>
+                <div style="margin-top:32px;padding-top:18px;border-top:2px solid #e2e8f0;color:#64748b;font-size:11px;text-align:center;">
+                    <p style="margin:5px 0;">Gerado por MolSim v3.3 - Quimioinformática de Alta Precisão</p>
+                    <p style="margin:5px 0;">${new Date().toLocaleDateString('pt-BR')} às ${new Date().toLocaleTimeString('pt-BR')}</p>
                 </div>
             `;
 
-            const opt = {
-                margin: 10,
-                filename: `MolSim_Relatorio_${currentResult.name_ref}_${new Date().getTime()}.pdf`,
-                image: { type: 'jpeg', quality: 0.98 },
-                html2canvas: { scale: 2 },
-                jsPDF: { orientation: 'portrait', unit: 'mm', format: 'a4' }
-            };
-
-            html2pdf().set(opt).from(element).save();
+            html2pdf().set({ margin: 10, filename: `MolSim_Relatorio_${currentResult.name_ref}_${Date.now()}.pdf`, image: { type: 'jpeg', quality: 0.98 }, html2canvas: { scale: 2 }, jsPDF: { orientation: 'portrait', unit: 'mm', format: 'a4' } }).from(element).save();
             showToast('Relatório PDF baixado com sucesso!', 'success');
         }
 
