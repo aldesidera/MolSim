@@ -61,6 +61,8 @@ def get_fingerprint(mol, fp_type):
     try:
         if fp_type == "Morgan2":
             return rdMolDescriptors.GetMorganFingerprintAsBitVect(mol, radius=2, nBits=2048)
+        elif fp_type == "Morgan2 FCFP":
+            return rdMolDescriptors.GetMorganFingerprintAsBitVect(mol, radius=2, nBits=2048, useFeatures=True)
         elif fp_type == "RDKit":
             return Chem.RDKFingerprint(mol)
         elif fp_type == "MACCS":
