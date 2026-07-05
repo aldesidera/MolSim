@@ -4,3 +4,5 @@ rdkit-pypi==2025.9.6
 fpdf2==2.7.0
 fpdf==1.7.2
 numpy<2
+pytest==7.4.3
+pytest-cov==4.1.0
