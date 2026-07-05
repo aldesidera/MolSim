@@ -182,7 +182,8 @@
                         name_test: document.getElementById('name-test').value || 'Teste',
                         fp_type: document.getElementById('fp-type').value,
                         metric: document.getElementById('metric').value,
-                        show_logd: document.getElementById('show-map').checked
+                        show_logd: document.getElementById('show-map').checked,
+                        generated_at: new Date().toLocaleString('pt-BR')
                     })
                 });
                 const result = await response.json();
@@ -289,7 +290,7 @@
                         </div>
                     </div>
                 </div>
-                <div style="margin-bottom:24px;">
+                <div style="margin-bottom:24px; page-break-before: always;">
                     <h2 style="color:#0f172a;margin:0 0 15px;font-size:18px;border-bottom:2px solid #e2e8f0;padding-bottom:10px;">Propriedades Físico-Químicas</h2>
                     <table style="width:100%;border-collapse:collapse;margin-top:10px;">
                         <thead><tr style="background:#f1f5f9;"><th style="padding:12px;text-align:left;border-bottom:2px solid #cbd5e1;font-weight:bold;color:#0f172a;font-size:12px;">Propriedade</th><th style="padding:12px;text-align:center;border-bottom:2px solid #cbd5e1;font-weight:bold;color:#0f172a;font-size:12px;">Referência</th><th style="padding:12px;text-align:center;border-bottom:2px solid #cbd5e1;font-weight:bold;color:#0f172a;font-size:12px;">Teste</th><th style="padding:12px;text-align:center;border-bottom:2px solid #cbd5e1;font-weight:bold;color:#0f172a;font-size:12px;">Diferença</th></tr></thead>
@@ -304,7 +305,14 @@
                 </div>
             `;
 
-            html2pdf().set({ margin: 10, filename: `MolSim_Relatorio_${currentResult.name_ref}_${Date.now()}.pdf`, image: { type: 'jpeg', quality: 0.98 }, html2canvas: { scale: 2 }, jsPDF: { orientation: 'portrait', unit: 'mm', format: 'a4' } }).from(element).save();
+            html2pdf().set({
+                margin: 10,
+                filename: `MolSim_Relatorio_${currentResult.name_ref}_${Date.now()}.pdf`,
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: { scale: 2 },
+                jsPDF: { orientation: 'portrait', unit: 'mm', format: 'a4' }
+            }).from(element).save();
+
             showToast('Relatório PDF baixado com sucesso!', 'success');
         }
 

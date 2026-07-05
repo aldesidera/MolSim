@@ -138,6 +138,7 @@ def export_pdf():
             return jsonify({"error": "Requisição JSON vazia"}), 400
 
         pdf = FPDF()
+        pdf.set_auto_page_break(auto=True, margin=15)
         pdf.add_page()
         pdf.set_font("Helvetica", "B", 16)
         pdf.cell(190, 10, "Análise de Similaridade Molecular", ln=True, align='C')
@@ -153,6 +154,7 @@ def export_pdf():
         pdf.cell(190, 8, f"Similaridade: {data['similarity']:.4f} ({data['classification']})", ln=True)
         pdf.ln(8)
 
+        # Página/Bloco 1: estruturas
         y = pdf.get_y()
         if data.get('png_ref'):
             try:
@@ -174,19 +176,24 @@ def export_pdf():
             except Exception as e:
                 logger.warning(f"Erro ao adicionar PNG test no PDF: {str(e)}")
 
-        pdf.ln(90)
+        pdf.ln(95)
+
+        # Página/Bloco 2: fingerprints em página separada para evitar corte
+        pdf.add_page()
+        pdf.set_font("Helvetica", "B", 11)
+        pdf.cell(190, 8, "Estruturas e Fingerprints", ln=True)
+        pdf.ln(5)
 
         if data.get('fingerprint_ref_png') or data.get('fingerprint_test_png'):
-            pdf.set_font("Helvetica", "B", 11)
-            pdf.cell(190, 8, "Estruturas e Fingerprints", ln=True)
-            pdf.ln(4)
-
             if data.get('fingerprint_ref_png'):
                 try:
                     fp_bytes = base64.b64decode(data['fingerprint_ref_png'])
                     with tempfile.NamedTemporaryFile(suffix='.png', delete=True) as tmp:
                         tmp.write(fp_bytes)
                         tmp.flush()
+                        pdf.set_font("Helvetica", "B", 10)
+                        pdf.cell(90, 8, f"Fingerprint: {data['name_ref']}", ln=0)
+                        pdf.ln(10)
                         pdf.image(tmp.name, x=15, y=pdf.get_y(), w=75)
                 except Exception as e:
                     logger.warning(f"Erro ao adicionar fingerprint ref no PDF: {str(e)}")
@@ -197,11 +204,18 @@ def export_pdf():
                     with tempfile.NamedTemporaryFile(suffix='.png', delete=True) as tmp:
                         tmp.write(fp_bytes)
                         tmp.flush()
+                        pdf.set_font("Helvetica", "B", 10)
+                        pdf.cell(90, 8, f"Fingerprint: {data['name_test']}", ln=0)
+                        pdf.ln(10)
                         pdf.image(tmp.name, x=110, y=pdf.get_y(), w=75)
                 except Exception as e:
                     logger.warning(f"Erro ao adicionar fingerprint test no PDF: {str(e)}")
 
-            pdf.ln(80)
+        # Página/Bloco 3: propriedades em página própria para não cortar
+        pdf.add_page()
+        pdf.set_font("Helvetica", "B", 11)
+        pdf.cell(190, 8, "Propriedades Físico-Químicas", ln=True)
+        pdf.ln(4)
 
         pdf.set_font("Helvetica", "B", 9)
         pdf.cell(60, 8, "Propriedade", border=1, align='C')
@@ -215,6 +229,10 @@ def export_pdf():
             pdf.cell(40, 8, str(prop['Referência']), border=1, align='C')
             pdf.cell(40, 8, str(prop['Teste']), border=1, align='C')
             pdf.cell(40, 8, str(prop['Diferença']), border=1, ln=True, align='C')
+
+        pdf.ln(8)
+        pdf.set_font("Helvetica", "I", 8)
+        pdf.cell(190, 6, f"Gerado em {data.get('generated_at', 'data não informada')}", ln=True, align='C')
 
         pdf_bytes = pdf.output()
         return send_file(

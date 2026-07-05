@@ -10,7 +10,6 @@ MolSim Final v3.3 — Análise Molecular Avançada
 import logging
 from typing import Tuple, Dict, Optional, List, Any
 import base64
-import io
 
 from rdkit import Chem
 from rdkit.Chem import AllChem, Descriptors, DataStructs, rdMolDescriptors, Crippen, MACCSkeys
@@ -146,15 +145,25 @@ def get_fingerprint(mol: Optional[Mol], fp_type: str) -> Optional[Any]:
 
 
 def fingerprint_to_png(mol: Optional[Mol], fp_type: str, size: int = FINGERPRINT_IMAGE_SIZE) -> Optional[str]:
+    """Gera uma imagem textual simples do fingerprint em PNG/base64.
+
+    Esta implementação produz um bloco visual com o nome do fingerprint e a contagem
+    de bits ativos, garantindo consistência no PDF sem depender de renderização extra.
+    """
     try:
         fp = get_fingerprint(mol, fp_type)
         if fp is None:
             return None
 
+        on_bits = list(fp.GetOnBits()) if hasattr(fp, "GetOnBits") else []
+        bit_count = len(on_bits)
+
         drawer = rdMolDraw2D.MolDraw2DCairo(size, 120)
         drawer.DrawString(f"Fingerprint: {fp_type}")
+        drawer.DrawString(f"Bits ativos: {bit_count}")
+        drawer.DrawString(f"Tamanho: {size}px")
         drawer.FinishDrawing()
-        return base64.b64encode(drawer.GetDrawingText()).decode('utf-8')
+        return base64.b64encode(drawer.GetDrawingText()).decode("utf-8")
     except Exception as e:
         logger.error(f"Erro ao gerar imagem do fingerprint: {str(e)}")
         return None
@@ -298,7 +307,15 @@ def calc_logd_vs_ph(mol: Optional[Mol], ph_range: Optional[List[int]] = None) ->
         return None
 
 
-def compare(smiles_ref: str, smiles_test: str, name_ref: str, name_test: str, fp_type: str, metric: str, show_map: bool = True) -> Tuple[Optional[Dict[str, Any]], Optional[str]]:
+def compare(
+    smiles_ref: str,
+    smiles_test: str,
+    name_ref: str,
+    name_test: str,
+    fp_type: str,
+    metric: str,
+    show_map: bool = True
+) -> Tuple[Optional[Dict[str, Any]], Optional[str]]:
     mol_ref, err_ref = get_mol(smiles_ref)
     mol_test, err_test = get_mol(smiles_test)
 
@@ -342,12 +359,12 @@ def compare(smiles_ref: str, smiles_test: str, name_ref: str, name_test: str, fp
         "properties": props_data,
         "svg_ref": mol_to_svg(mol_ref),
         "svg_test": mol_to_svg(mol_test),
-        "png_ref": base64.b64encode(png_ref).decode('utf-8') if png_ref else None,
-        "png_test": base64.b64encode(png_test).decode('utf-8') if png_test else None,
+        "png_ref": base64.b64encode(png_ref).decode("utf-8") if png_ref else None,
+        "png_test": base64.b64encode(png_test).decode("utf-8") if png_test else None,
         "fingerprint_ref_png": fingerprint_to_png(mol_ref, fp_type),
         "fingerprint_test_png": fingerprint_to_png(mol_test, fp_type),
         "similarity_map": similarity_map,
-        "similarity_map_png": base64.b64encode(similarity_map_png).decode('utf-8') if similarity_map_png else None,
+        "similarity_map_png": base64.b64encode(similarity_map_png).decode("utf-8") if similarity_map_png else None,
         "molblock_ref": molblock_ref,
         "molblock_test": molblock_test,
         "fp_type": fp_type,
@@ -356,7 +373,13 @@ def compare(smiles_ref: str, smiles_test: str, name_ref: str, name_test: str, fp
     }, None
 
 
-def bulk_compare(ref_smiles: str, smiles_list: List[str], names_list: Optional[List[str]] = None, fp_type: str = "Morgan2", metric: str = "Tanimoto") -> Tuple[Optional[List[Dict[str, Any]]], Optional[str]]:
+def bulk_compare(
+    ref_smiles: str,
+    smiles_list: List[str],
+    names_list: Optional[List[str]] = None,
+    fp_type: str = "Morgan2",
+    metric: str = "Tanimoto"
+) -> Tuple[Optional[List[Dict[str, Any]]], Optional[str]]:
     mol_ref, err = get_mol(ref_smiles)
     if err or not mol_ref:
         return None, err or "SMILES de referência inválido"
