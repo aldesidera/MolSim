@@ -159,7 +159,7 @@ def get_properties(mol: Optional[Mol]) -> Optional[Dict[str, Any]]:
     Example:
         >>> mol, _ = get_mol("CC(=O)OC1=CC=CC=C1C(=O)O")
         >>> props = get_properties(mol)
-        >>> print(f"MW: {props['Peso Molecular (g/mol)']}") 
+        >>> print(f"MW: {props['Peso Molecular (g/mol)']}")
     """
     if not mol:
         logger.warning("Tentativa de calcular propriedades com mol=None")
