@@ -3,10 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MolSim v3.2.6 — Análise Molecular Avançada</title>
+    <title>MolSim v3.3 — Análise Molecular Avançada</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
     <script src="https://3dmol.org/build/3Dmol-min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
@@ -81,14 +82,59 @@
             gap: 2rem;
         }
 
+        /* PDF Icon Button */
+        .pdf-export-btn {
+            position: fixed;
+            top: 30px;
+            right: 30px;
+            z-index: 40;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #ef4444, #dc2626);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            cursor: pointer;
+            box-shadow: 0 8px 24px rgba(239, 68, 68, 0.4);
+            transition: all 0.3s ease;
+            border: none;
+        }
+
+        .pdf-export-btn:hover {
+            transform: scale(1.1) rotate(5deg);
+            box-shadow: 0 12px 32px rgba(239, 68, 68, 0.6);
+            background: linear-gradient(135deg, #dc2626, #991b1b);
+        }
+
+        .pdf-export-btn:active {
+            transform: scale(0.95);
+        }
+
+        .pdf-export-btn.hidden {
+            display: none;
+        }
+
         /* Custom Scrollbar */
         ::-webkit-scrollbar { width: 8px; }
         ::-webkit-scrollbar-track { background: transparent; }
         ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
         ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+
+        /* Print Styles */
+        @media print {
+            body::before { display: none; }
+        }
     </style>
 </head>
 <body class="py-12">
+    <!-- PDF Export Button -->
+    <button id="pdf-export-btn" class="pdf-export-btn hidden" onclick="downloadReport()" title="Baixar Relatório em PDF">
+        <i class="fas fa-file-pdf"></i>
+    </button>
+
     <div class="max-w-[1400px] mx-auto px-6">
         <div class="main-container p-8 md:p-12">
             <!-- Header -->
@@ -96,14 +142,9 @@
                 <div class="flex items-center gap-5">
                     <div class="w-16 h-16 bg-white text-sky-600 rounded-2xl flex items-center justify-center text-4xl shadow-sm border border-slate-100">🧪</div>
                     <div>
-                        <h1 class="text-5xl font-black tracking-tighter text-slate-900">MolSim <span class="text-sky-600">v3.2.6</span></h1>
+                        <h1 class="text-5xl font-black tracking-tighter text-slate-900">MolSim <span class="text-sky-600">v3.3</span></h1>
                         <p class="text-slate-500 font-semibold tracking-wide">Quimioinformática de Alta Precisão</p>
                     </div>
-                </div>
-                <div id="header-actions" class="hidden">
-                    <button onclick="exportPDF()" class="flex items-center gap-3 px-8 py-4 bg-emerald-600 text-white rounded-2xl font-bold hover:bg-emerald-700 transition-all shadow-lg shadow-emerald-100 hover:-translate-y-0.5">
-                        <i class="fas fa-file-pdf"></i> EXPORTAR PDF
-                    </button>
                 </div>
             </div>
 
@@ -116,28 +157,29 @@
                         <div class="space-y-6 flex-grow">
                             <div>
                                 <label class="block text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-2">Referência</label>
-                                <input id="smiles-ref" type="text" placeholder="SMILES" class="w-full px-5 py-4 bg-white border border-slate-200 rounded-2xl font-mono text-sm focus:ring-2 focus:ring-sky-500 outline-none transition-all">
-                                <input id="name-ref" type="text" placeholder="Nome da Molécula" class="mt-3 w-full px-5 py-4 bg-white border border-slate-200 rounded-2xl text-sm focus:ring-2 focus:ring-sky-500 outline-none transition-all">
+                                <input id="smiles-ref" type="text" placeholder="SMILES" class="w-full px-5 py-4 bg-white border border-slate-200 rounded-2xl font-mono text-sm focus:ring-2 focus:ring-sky-300 focus:border-sky-300 outline-none transition-all">
+                                <input id="name-ref" type="text" placeholder="Nome da Molécula" class="mt-3 w-full px-5 py-4 bg-white border border-slate-200 rounded-2xl text-sm focus:ring-2 focus:ring-sky-300 focus:border-sky-300 outline-none transition-all">
                             </div>
 
                             <div>
                                 <label class="block text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-2">Teste</label>
-                                <input id="smiles-test" type="text" placeholder="SMILES" class="w-full px-5 py-4 bg-white border border-slate-200 rounded-2xl font-mono text-sm focus:ring-2 focus:ring-sky-500 outline-none transition-all">
-                                <input id="name-test" type="text" placeholder="Nome da Molécula" class="mt-3 w-full px-5 py-4 bg-white border border-slate-200 rounded-2xl text-sm focus:ring-2 focus:ring-sky-500 outline-none transition-all">
+                                <input id="smiles-test" type="text" placeholder="SMILES" class="w-full px-5 py-4 bg-white border border-slate-200 rounded-2xl font-mono text-sm focus:ring-2 focus:ring-sky-300 focus:border-sky-300 outline-none transition-all">
+                                <input id="name-test" type="text" placeholder="Nome da Molécula" class="mt-3 w-full px-5 py-4 bg-white border border-slate-200 rounded-2xl text-sm focus:ring-2 focus:ring-sky-300 focus:border-sky-300 outline-none transition-all">
                             </div>
 
                             <div class="grid grid-cols-2 gap-4">
                                 <div>
                                     <label class="block text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-2">Fingerprint</label>
-                                    <select id="fp-type" class="w-full px-5 py-4 bg-white border border-slate-200 rounded-2xl text-sm outline-none cursor-pointer hover:border-sky-300 transition-all">
+                                    <select id="fp-type" class="w-full px-5 py-4 bg-white border border-slate-200 rounded-2xl text-sm outline-none cursor-pointer hover:border-sky-300 transition-all focus:ring-2 focus:ring-sky-300">
                                         <option value="Morgan2">Morgan2</option>
+                                        <option value="Morgan2 FCFP">Morgan2 FCFP</option>
                                         <option value="RDKit">RDKit</option>
                                         <option value="MACCS">MACCS</option>
                                     </select>
                                 </div>
                                 <div>
                                     <label class="block text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-2">Métrica</label>
-                                    <select id="metric" class="w-full px-5 py-4 bg-white border border-slate-200 rounded-2xl text-sm outline-none cursor-pointer hover:border-sky-300 transition-all">
+                                    <select id="metric" class="w-full px-5 py-4 bg-white border border-slate-200 rounded-2xl text-sm outline-none cursor-pointer hover:border-sky-300 transition-all focus:ring-2 focus:ring-sky-300">
                                         <option value="Tanimoto">Tanimoto</option>
                                         <option value="Dice">Dice</option>
                                     </select>
@@ -155,7 +197,7 @@
                             </label>
                         </div>
 
-                        <button onclick="compareMolecules()" id="btn-compare" class="mt-8 w-full bg-sky-600 hover:bg-sky-700 text-white font-black py-5 rounded-2xl text-lg flex items-center justify-center gap-3 transition-all shadow-xl shadow-sky-100 active:scale-[0.98]">
+                        <button onclick="compareMolecules()" id="btn-compare" class="mt-8 w-full bg-sky-600 hover:bg-sky-700 text-white font-black py-5 rounded-2xl text-lg flex items-center justify-center gap-3 transition-all shadow-lg shadow-sky-500/30">
                             <i class="fas fa-bolt"></i> COMPARAR AGORA
                         </button>
                     </div>
@@ -257,6 +299,11 @@
     <!-- Toast -->
     <div id="toast" class="hidden fixed bottom-8 right-8 px-8 py-5 rounded-2xl shadow-2xl text-white font-bold flex items-center gap-4 z-50 transition-all transform translate-y-0"></div>
 
+    <!-- Hidden PDF Content -->
+    <div id="pdf-content" class="hidden" style="background: white; padding: 40px; font-family: Arial, sans-serif; color: #333;">
+        <!-- Will be populated by JavaScript -->
+    </div>
+
     <script>
         let currentResult = null;
         let logdChartInstance = null;
@@ -295,6 +342,7 @@
 
                 currentResult = result;
                 renderResults(result);
+                document.getElementById('pdf-export-btn').classList.remove('hidden');
                 showToast('Análise concluída com sucesso!', 'success');
             } catch (e) {
                 showToast(e.message, 'error');
@@ -308,7 +356,6 @@
             document.getElementById('placeholder-results').classList.add('hidden');
             document.getElementById('result-content').classList.remove('hidden');
             document.getElementById('bottom-results').classList.remove('hidden');
-            document.getElementById('header-actions').classList.remove('hidden');
 
             // Score
             document.getElementById('similarity-score').textContent = r.similarity.toFixed(4);
@@ -406,31 +453,102 @@
             });
         }
 
-        function exportPDF() {
+        function downloadReport() {
             if (!currentResult) return;
-            showToast('Gerando relatório PDF...', 'success');
-            fetch('/export-pdf', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(currentResult)
-            })
-            .then(res => res.blob())
-            .then(blob => {
-                const url = window.URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = `MolSim_Relatorio_${currentResult.name_ref}.pdf`;
-                document.body.appendChild(a);
-                a.click();
-                a.remove();
-            })
-            .catch(e => showToast('Erro ao exportar PDF', 'error'));
+            showToast('Gerando relatório PDF...', 'info');
+            
+            // Cria o conteúdo do PDF
+            const element = document.createElement('div');
+            element.style.padding = '40px';
+            element.style.fontFamily = 'Arial, sans-serif';
+            element.innerHTML = `
+                <div style="text-align: center; margin-bottom: 40px; border-bottom: 3px solid #0ea5e9; padding-bottom: 30px;">
+                    <h1 style="font-size: 32px; color: #0f172a; margin: 0; font-weight: bold;">MolSim v3.3</h1>
+                    <p style="color: #64748b; font-size: 14px; margin: 10px 0 0 0;">Relatório de Análise de Similaridade Molecular</p>
+                </div>
+
+                <div style="margin-bottom: 30px; background: #f8fafc; padding: 20px; border-radius: 8px; border-left: 4px solid #0ea5e9;">
+                    <h2 style="color: #0f172a; margin: 0 0 15px 0; font-size: 18px;">Resumo da Análise</h2>
+                    <table style="width: 100%; border-collapse: collapse;">
+                        <tr>
+                            <td style="padding: 8px; color: #64748b; font-weight: bold;">Molécula Referência:</td>
+                            <td style="padding: 8px; color: #0f172a;">${currentResult.name_ref}</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 8px; color: #64748b; font-weight: bold;">Molécula Teste:</td>
+                            <td style="padding: 8px; color: #0f172a;">${currentResult.name_test}</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 8px; color: #64748b; font-weight: bold;">Fingerprint:</td>
+                            <td style="padding: 8px; color: #0f172a;">${currentResult.fp_type}</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 8px; color: #64748b; font-weight: bold;">Métrica:</td>
+                            <td style="padding: 8px; color: #0f172a;">${document.getElementById('metric').value}</td>
+                        </tr>
+                    </table>
+                </div>
+
+                <div style="margin-bottom: 30px; background: #f0fdf4; padding: 20px; border-radius: 8px; border-left: 4px solid #10b981;">
+                    <h2 style="color: #0f172a; margin: 0 0 15px 0; font-size: 18px;">Resultado</h2>
+                    <div style="display: flex; align-items: center; gap: 20px;">
+                        <div style="text-align: center;">
+                            <div style="font-size: 48px; color: #0ea5e9; font-weight: bold;">${currentResult.similarity.toFixed(4)}</div>
+                            <div style="color: #64748b; font-size: 12px; margin-top: 5px;">Índice de Similaridade</div>
+                        </div>
+                        <div style="text-align: center; background: ${currentResult.classification.includes('Alta') ? '#d1fae5' : '#fef3c7'}; padding: 15px 25px; border-radius: 8px;">
+                            <div style="color: ${currentResult.classification.includes('Alta') ? '#047857' : '#92400e'}; font-weight: bold;">${currentResult.classification}</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div style="margin-bottom: 30px;">
+                    <h2 style="color: #0f172a; margin: 0 0 15px 0; font-size: 18px; border-bottom: 2px solid #e2e8f0; padding-bottom: 10px;">Propriedades Físico-Químicas</h2>
+                    <table style="width: 100%; border-collapse: collapse; margin-top: 10px;">
+                        <thead>
+                            <tr style="background: #f1f5f9;">
+                                <th style="padding: 12px; text-align: left; border-bottom: 2px solid #cbd5e1; font-weight: bold; color: #0f172a; font-size: 12px;">Propriedade</th>
+                                <th style="padding: 12px; text-align: center; border-bottom: 2px solid #cbd5e1; font-weight: bold; color: #0f172a; font-size: 12px;">Referência</th>
+                                <th style="padding: 12px; text-align: center; border-bottom: 2px solid #cbd5e1; font-weight: bold; color: #0f172a; font-size: 12px;">Teste</th>
+                                <th style="padding: 12px; text-align: center; border-bottom: 2px solid #cbd5e1; font-weight: bold; color: #0f172a; font-size: 12px;">Diferença</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${currentResult.properties.map((p, i) => `
+                                <tr style="border-bottom: 1px solid #e2e8f0; ${i % 2 === 0 ? 'background: #f8fafc;' : ''}">
+                                    <td style="padding: 10px 12px; color: #0f172a; font-size: 12px;">${p.Propriedade}</td>
+                                    <td style="padding: 10px 12px; text-align: center; color: #64748b; font-size: 12px;">${p.Referência}</td>
+                                    <td style="padding: 10px 12px; text-align: center; color: #64748b; font-size: 12px;">${p.Teste}</td>
+                                    <td style="padding: 10px 12px; text-align: center; color: #64748b; font-size: 12px;">${p.Diferença}</td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                </div>
+
+                <div style="margin-top: 40px; padding-top: 20px; border-top: 2px solid #e2e8f0; color: #64748b; font-size: 11px; text-align: center;">
+                    <p style="margin: 5px 0;">Gerado por MolSim v3.3 - Quimioinformática de Alta Precisão</p>
+                    <p style="margin: 5px 0;">${new Date().toLocaleDateString('pt-BR')} às ${new Date().toLocaleTimeString('pt-BR')}</p>
+                </div>
+            `;
+
+            const opt = {
+                margin: 10,
+                filename: `MolSim_Relatorio_${currentResult.name_ref}_${new Date().getTime()}.pdf`,
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: { scale: 2 },
+                jsPDF: { orientation: 'portrait', unit: 'mm', format: 'a4' }
+            };
+
+            html2pdf().set(opt).from(element).save();
+            showToast('Relatório PDF baixado com sucesso!', 'success');
         }
 
         function showToast(msg, type) {
             const toast = document.getElementById('toast');
             toast.textContent = msg;
-            toast.className = `fixed bottom-8 right-8 px-8 py-5 rounded-2xl shadow-2xl text-white font-black z-50 transition-all ${type === 'success' ? 'bg-emerald-500' : 'bg-rose-500'}`;
+            const bgColor = type === 'success' ? 'bg-emerald-500' : type === 'error' ? 'bg-rose-500' : 'bg-sky-500';
+            toast.className = `fixed bottom-8 right-8 px-8 py-5 rounded-2xl shadow-2xl text-white font-black z-50 transition-all ${bgColor}`;
             toast.classList.remove('hidden');
             setTimeout(() => toast.classList.add('hidden'), 4000);
         }
